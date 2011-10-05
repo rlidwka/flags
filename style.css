@@ -1,0 +1,25 @@
+body {
+	text-align: center;
+}
+
+.result {
+	padding-bottom: 20px;
+}
+
+.result table {
+	text-align: center;
+	border-collapse: collapse;
+}
+
+.result td, .result th {
+	border: 1px solid gray;
+	padding: 2px;
+}
+
+.wrong {
+	background-color: #ffcccc;
+}
+
+.ok {
+	background-color: #ccffcc;
+}
