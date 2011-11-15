@@ -29,7 +29,7 @@ my $start = start_html({
 $start =~ s{<!DOCTYPE.*?>}{<!DOCTYPE html>}s;
 print $start;
 
-print '<div><canvas id="graph" width=100 height=100>[ вам определённо пора обновить браузер :) ]</canvas></div>';
+print '<div><canvas id="graph" width=100 height=50>[ вам определённо пора обновить браузер :) ]</canvas></div>';
 print '<div><a href="submit.pl">Добавить флаги...</a></div><br>';
 
 sub printcell 

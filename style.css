@@ -1,5 +1,6 @@
 body {
 	text-align: center;
+	margin: 0px;
 }
 
 .result {
@@ -22,4 +23,8 @@ body {
 
 .ok {
 	background-color: #ccffcc;
+}
+
+canvas {
+	display: block;
 }

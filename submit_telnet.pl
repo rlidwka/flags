@@ -29,7 +29,9 @@ sub addflag
 	}
 	print "$flag - $result (resubmitting)\n" if ($resubmit);
 	$dbh->do('UPDATE flags SET anstime=NOW(), answer=?, resubmit=?, isok=? WHERE flag=?', undef, $result, $resubmit, $isok, $flag);
-	$dbh->do('INSERT INTO answers (answer, action, count, first) VALUES(?, ?, 1, NOW()) ON DUPLICATE KEY UPDATE count=count+1, first=first', undef, $result, $resubmit ? 'resubmit' : ($isok ? 'accepted' : 'rejected'));
+
+	my $action = $resubmit ? 'resubmitting' : ($isok ? 'ok' : 'wrong');
+	$dbh->do('INSERT INTO answers (answer, action, count, first) VALUES(?, ?, 1, NOW()) ON DUPLICATE KEY UPDATE count=count+1, first=first, action=?', undef, $result, $action, $action);
 
 	if (!$resubmit) {
 		$dbh->do('INSERT INTO graph (time_min, accepted, rejected) VALUES(?, ?, ?) ON DUPLICATE KEY UPDATE accepted=accepted+?, rejected=rejected+?', undef, int(time()/60), $isok?1:0, $isok?0:1, $isok?1:0, $isok?0:1);
