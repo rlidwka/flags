@@ -9,12 +9,7 @@ use Data::Dumper;
 use HTML::Entities qw(decode_entities);
 use URI::Escape;
 
-binmode(STDOUT, ":utf8");
-
-if (!allowed_ip(remote_host())) {
-	raise_error();
-	exit 0;
-}
+web_init();
 
 our $dbh = connectdb();
 
@@ -23,13 +18,18 @@ print header(
 	-charset => 'UTF-8'
 );
 
-print start_html({
+my $start = start_html({
 	-title => 'Flag submitter',
 	-head => [
 		Link({-rel => "stylesheet", -type => "text/css", -href => "style.css"}),
 	],
+	-script => {-src=>'scripts.js'},
 });
+# patch for html5
+$start =~ s{<!DOCTYPE.*?>}{<!DOCTYPE html>}s;
+print $start;
 
+print '<div><canvas id="graph" width=100 height=100>[ вам определённо пора обновить браузер :) ]</canvas></div>';
 print '<div><a href="submit.pl">Добавить флаги...</a></div><br>';
 
 sub printcell 
@@ -79,10 +79,38 @@ sub showstat {
 	print '</table></div>';
 }
 
+sub showans {
+	print '<div align="center" class="result"><table width="60%"><tr><th width="20%">Answer</th><th width="20%">First time</th><th width="20%">Count</th><th width="20%">Action</th></tr>';
+	my @ans = @{$dbh->selectall_arrayref("SELECT answer,action,count,first from answers ORDER BY answer")};
+
+	foreach (@ans) {
+		print '<tr>';
+		print '<td>'.$_->[0].'</td>';
+		print '<td>'.$_->[3].'</td>';
+		print '<td>'.$_->[2].'</td>';
+		print '<td>'.$_->[1].'</td>';
+		print '</tr>';
+	}
+	print '</table></div>';
+}
+
 #print "<h3>Last hour</h3>";
 #showstat(1);
 #print "<h3>All time</h3>";
-showstat(0);
+showstat();
+print '<hr>';
+print "<h4>Ответы системы (для дебага)</h4>";
+showans();
+
+my @graph = @{$dbh->selectall_arrayref("SELECT time_min,accepted,rejected from graph WHERE time_min > ?", undef, time()/60-60*24)};
+print '<script language="javascript">';
+print 'var data = [';
+print join("\n", map {
+	sprintf('["%d","%d","%d"],', @$_);
+} @graph);
+print '];';
+print "draw_data(data, ".int(time()/60).");";
+print '</script>';
 
 print end_html();
 

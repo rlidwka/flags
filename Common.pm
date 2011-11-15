@@ -9,12 +9,22 @@ use HTML::Entities qw(decode_entities);
 use CGI qw/-utf8 :standard/;
 
 our @ISA = qw(Exporter);
-our @EXPORT = qw(connectdb strtoflags addflag encode_entities allowed_ip raise_error config);
+our @EXPORT = qw(connectdb strtoflags addflag encode_entities allowed_ip raise_error config web_init);
 
 my $config = {};
 open F, "Config.pl";
 $config = eval(join "",<F>);
 close F;
+
+sub web_init
+{
+	binmode(STDOUT, ":utf8");
+
+	if (!allowed_ip(remote_addr())) {
+		raise_error();
+		exit 0;
+	}
+}
 
 sub see_config
 {
@@ -33,10 +43,13 @@ sub config
 sub allowed_ip
 {
 	my $ip = shift;
-	return $ip !~ /^10\./;
-	return scalar grep {
-		$_ eq $ip;
-	} split ' ', '::1 127.0.0.1 178.46.215.231';
+	return 0 if (scalar grep {
+		$ip =~ /^$_$/;
+	} @{config('deny_ip')});
+	return 1 if (scalar grep {
+		$ip =~ /^$_$/;
+	} @{config('allow_ip')});
+	return 0;
 }
 
 sub raise_error

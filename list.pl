@@ -9,12 +9,7 @@ use Data::Dumper;
 use HTML::Entities qw(decode_entities);
 use URI::Escape;
 
-binmode(STDOUT, ":utf8");
-
-if (!allowed_ip(remote_host())) {
-	raise_error();
-	exit 0;
-}
+web_init();
 
 sub get_sql_order
 {

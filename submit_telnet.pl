@@ -13,7 +13,7 @@ our $dbh = connectdb();
 my @flags = @{$dbh->selectcol_arrayref('SELECT flag FROM flags WHERE resubmit=1 ORDER BY anstime ASC, addtime ASC LIMIT 10')};
 exit if (!@flags);
 
-our %answers = config('submit/answers');
+our %answers = %{config('submit/answers')};
 
 sub addflag
 {
@@ -29,6 +29,11 @@ sub addflag
 	}
 	print "$flag - $result (resubmitting)\n" if ($resubmit);
 	$dbh->do('UPDATE flags SET anstime=NOW(), answer=?, resubmit=?, isok=? WHERE flag=?', undef, $result, $resubmit, $isok, $flag);
+	$dbh->do('INSERT INTO answers (answer, action, count, first) VALUES(?, ?, 1, NOW()) ON DUPLICATE KEY UPDATE count=count+1, first=first', undef, $result, $resubmit ? 'resubmit' : ($isok ? 'accepted' : 'rejected'));
+
+	if (!$resubmit) {
+		$dbh->do('INSERT INTO graph (time_min, accepted, rejected) VALUES(?, ?, ?) ON DUPLICATE KEY UPDATE accepted=accepted+?, rejected=rejected+?', undef, int(time()/60), $isok?1:0, $isok?0:1, $isok?1:0, $isok?0:1);
+	}
 }
 
 $| = 1;
