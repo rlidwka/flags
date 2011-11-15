@@ -36,8 +36,8 @@ $| = 1;
 my ($socket,$client_socket);
 
 $socket = new IO::Socket::INET (
-	PeerHost => '127.0.0.1',
-	PeerPort => '8000',
+	PeerHost => config('submit/host'),
+	PeerPort => config('submit/port'),
 	Proto => 'tcp',
 ) or die "sock error: $!\n";
 $socket->blocking(0);

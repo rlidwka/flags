@@ -37,17 +37,21 @@ if (param('flags')) {
 }
 
 print '<body>';
-if (@flags) {
-	print '<div class="result" align="center"><table width="60%">';
-	print '<th>Flag</th><th>Result</th>';
-	print join '', map {
-		my $r = '<tr class="'.$_->[2].'">';
-		$r .= '<td>'.encode_entities($_->[0]).'</td>';
-		$r .= '<td>'.$_->[1].'</td>';
-		$r .= '</tr>';
-		$r;
-	} @flags;
-	print '</table></div>';
+if (param('flags')) {
+	if (@flags) {
+		print '<div class="result" align="center"><table width="60%">';
+		print '<th>Flag</th><th>Result</th>';
+		print join '', map {
+			my $r = '<tr class="'.$_->[2].'">';
+			$r .= '<td>'.encode_entities($_->[0]).'</td>';
+			$r .= '<td>'.$_->[1].'</td>';
+			$r .= '</tr>';
+			$r;
+		} @flags;
+		print '</table></div>';
+	} else {
+		print '<div class="result" align="center">No flags detected here</div>';
+	}
 }
 print '<div class="submit"><form method="POST" action="submit.pl">';
 print '<div><textarea name="flags" cols="80" rows="30"></textarea></div>';
