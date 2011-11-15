@@ -8,6 +8,8 @@ use Data::Dumper;
 use Common;
 use HTML::Entities qw(decode_entities);
 
+binmode(STDOUT, ":utf8");
+
 if (!allowed_ip(remote_host())) {
 	raise_error();
 	exit 0;

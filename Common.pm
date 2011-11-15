@@ -4,11 +4,31 @@ use Exporter;
 use warnings;
 use strict;
 use DBI;
+use Data::Dumper;
 use HTML::Entities qw(decode_entities);
 use CGI qw/-utf8 :standard/;
 
 our @ISA = qw(Exporter);
-our @EXPORT = qw(connectdb strtoflags addflag encode_entities allowed_ip raise_error);
+our @EXPORT = qw(connectdb strtoflags addflag encode_entities allowed_ip raise_error config);
+
+my $config = {};
+open F, "Config.pl";
+$config = eval(join "",<F>);
+close F;
+
+sub see_config
+{
+	my $_config = shift;
+	my $arg = shift;
+	return undef unless (ref $_config);
+	return $_config->{$arg} unless (@_);
+	return see_config($_config->{$arg}, @_);
+}
+
+sub config
+{
+	return see_config($config, split('/', shift()));
+}
 
 sub allowed_ip
 {
@@ -36,7 +56,7 @@ sub encode_entities
 
 sub connectdb
 {
-	my $dbh = DBI->connect('DBI:mysql:flags', 'flags', 'HSSwtfRRVVFDtErU', { mysql_enable_utf8 => 1 }) 
+	my $dbh = DBI->connect('DBI:mysql:'.config('mysql/db'), config('mysql/user'), config('mysql/pass'), { mysql_enable_utf8 => 1 }) 
 		or die "Could not connect to database: $DBI::errstr";
 	$dbh->do("set character set utf8");
 	$dbh->do("set names utf8");
@@ -46,10 +66,8 @@ sub connectdb
 sub strtoflags
 {
 	$_ = shift;
-#	return m/(\d+)/g;
-#	return m/[a-zA-Z0-9]{30}==/g;
-#	return m/[a-f0-9]{32}/ig;
-	return m/[a-zA-Z0-9]{32,}/g;
+	my $regexp = config('flag_regexp');
+	return m/$regexp/g;
 }
 
 sub addflag

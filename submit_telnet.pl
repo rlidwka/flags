@@ -13,11 +13,7 @@ our $dbh = connectdb();
 my @flags = @{$dbh->selectcol_arrayref('SELECT flag FROM flags WHERE resubmit=1 ORDER BY anstime ASC, addtime ASC LIMIT 10')};
 exit if (!@flags);
 
-our %answers = (
-	"Not a flag" => 0,
-	"Accepted" => 1,
-	"Rejected" => 0,
-);
+our %answers = config('submit/answers');
 
 sub addflag
 {
