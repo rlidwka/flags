@@ -51,7 +51,7 @@ function draw_data(data, curr)
 	ctx.rect(0, 0, width, height);
 	ctx.lineWidth = 1;
 
-	for (var i=0; i<width/unit_w+1; i+=30) {
+	for (var i=curr-Math.floor(curr/30)*30; i<width/unit_w+1; i+=30) {
 		ctx.moveTo(width-unit_w*i-0.5, 0);
 		ctx.lineTo(width-unit_w*i-0.5, height);
 	}
