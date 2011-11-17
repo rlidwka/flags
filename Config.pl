@@ -8,6 +8,7 @@
 
 	# telnet receiver settings 
 	telnet => {
+		host => '0.0.0.0',
 		port => 12321,
 	},
 

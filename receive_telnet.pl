@@ -50,4 +50,4 @@ use Common;
 
 use lib 'lib';
 
-Server->run(port => config('telnet/port'));
+Server->run(host => config('telnet/host'), port => config('telnet/port'));
