@@ -98,7 +98,7 @@ foreach (@flags) {
 		print '<tr class="wrong">';
 	}
 	print '<td>'.encode_entities($_->[0]).'</td>';
-	print '<td>'.encode_entities($_->[1]).'</td>';
+	print '<td>'.mask_flag($_->[1]).'</td>';
 	print '<td>'.encode_entities($_->[2]).'</td>';
 	print '<td>'.encode_entities($_->[5]).'</td>';
 	print '<td>'.encode_entities($_->[6]).'</td>';

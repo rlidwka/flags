@@ -24,6 +24,7 @@ my $start = start_html({
 		Link({-rel => "stylesheet", -type => "text/css", -href => "style.css"}),
 	],
 	-script => {-src=>'scripts.js'},
+	-class => 'nomargin',
 });
 # patch for html5
 $start =~ s{<!DOCTYPE.*?>}{<!DOCTYPE html>}s;

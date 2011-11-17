@@ -1,5 +1,8 @@
 body {
 	text-align: center;
+}
+
+.nomargin {
 	margin: 0px;
 }
 

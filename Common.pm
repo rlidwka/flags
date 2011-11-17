@@ -5,16 +5,32 @@ use warnings;
 use strict;
 use DBI;
 use Data::Dumper;
-use HTML::Entities qw(decode_entities);
+use HTML::Entities qw(encode_entities decode_entities);
 use CGI qw/-utf8 :standard/;
 
 our @ISA = qw(Exporter);
-our @EXPORT = qw(connectdb strtoflags addflag encode_entities allowed_ip raise_error config web_init);
+our @EXPORT = qw(connectdb strtoflags addflag encode_entities allowed_ip raise_error config web_init mask_flag);
 
 my $config = {};
 open F, "Config.pl";
 $config = eval(join "",<F>);
 close F;
+
+sub mask_flag
+{
+	my $flag = shift;
+	my $conf = config('web/mask_flag');
+	return encode_entities($flag) if (!$conf);
+	my $prefix = 5;
+	my $suffix = 3;
+	my $sub = '<font color="grey">&lt;...&gt;</font>';
+	return $sub if (length($flag) < $prefix+$suffix+10);
+	my $result = '';
+	$result .= encode_entities(substr($flag, 0, $prefix)) if ($prefix > 0);
+	$result .= $sub;
+	$result .= encode_entities(substr($flag, length($flag)-$suffix)) if ($suffix > 0);
+	return $result;
+}
 
 sub web_init
 {

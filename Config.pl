@@ -12,6 +12,11 @@
 		port => 12321,
 	},
 
+	# anything related to web interface
+	web => {
+		mask_flag => 1,
+	},
+
 	# submitting to flag checker
 	submit => {
 		host => '127.0.0.1',
