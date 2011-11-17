@@ -37,9 +37,9 @@ sub printcell
 	my $x = shift;
 	my $diff = shift;
 	if ($diff) {
-		printf "<td>%d <font color=\"green\">(+%d)</font></td>", $x, $diff;
+		return sprintf "<td>%d <font color=\"green\">(+%d)</font></td>", $x, $diff;
 	} else {
-		printf "<td>%d</td>", $x;
+		return sprintf "<td>%d</td>", $x;
 	}
 }
 
@@ -48,6 +48,7 @@ sub showstat {
 	print '<div align="center" class="result"><table width="60%"><tr><th width="20%">IP</th><th width="20%">Processing</th><th width="20%">Accepted</th><th width="20%">Rejected</th><th width="20%">Total</th></tr>';
 	my %flags_h = %{$dbh->selectall_hashref("SELECT `from`, COUNT(*) as `total`, SUM(`resubmit`) as `resubmit`, SUM(`isok`) as `accepted` FROM `flags` WHERE `anstime` > DATE_SUB(NOW(), INTERVAL 1 HOUR) GROUP BY `from`", 'from')};
 	my %flags = %{$dbh->selectall_hashref("SELECT `from`, COUNT(*) as `total`, SUM(`resubmit`) as `resubmit`, SUM(`isok`) as `accepted` FROM `flags` GROUP BY `from`", 'from')};
+	my $str = '';
 	
 	my @res = (0, 0, 0, 0);
 	my @resh = (0, 0, 0, 0);
@@ -55,27 +56,29 @@ sub showstat {
 		my $h = $flags_h{$_};
 		my $f = $flags{$_};
 		my ($t, $d);
-		print '<tr>';
-		print '<td><a href="list.pl?ip='.uri_escape($f->{from}).'">'.encode_entities($f->{from}).'</a></td>';
+		$str .= '<tr>';
+		$str .= '<td><a href="list.pl?ip='.uri_escape($f->{from}).'">'.encode_entities($f->{from}).'</a></td>';
 		$res[0] += $t = int($f->{resubmit});
 		$resh[0] += $d = ref $h ? int($h->{resubmit}) : 0;
-		printcell($t, $d);
+		$str .= printcell($t, $d);
 		$res[1] += $t = int($f->{accepted});
 		$resh[1] += $d = ref $h ? int($h->{accepted}) : 0;
-		printcell($t, $d);
+		$str .= printcell($t, $d);
 		$res[2] += $t = int($f->{total}) - int($f->{accepted}) - int($f->{resubmit});
 		$resh[2] += $d = ref $h ? int($h->{total}) - int($h->{accepted}) - int($h->{resubmit}) : 0;
-		printcell($t, $d);
+		$str .= printcell($t, $d);
 		$res[3] += $t = int($f->{total});
 		$resh[3] += $d = ref $h ? int($h->{total}) : 0;
-		printcell($t, $d);
-		print '</tr>';
+		$str .= printcell($t, $d);
+		$str .= '</tr>';
 	}
 	print '<tr>';
-	print '<td><a href="list.pl">All flags</a></td>';
-	printcell($res[$_], $resh[$_]) for (0..3);
+	print '<td><a href="list.pl">-- All flags --</a></td>';
+	print printcell($res[$_], $resh[$_]) for (0..3);
 	print '</tr>';
+	print '<tr><td colspan=5></td></tr>';
 
+	print $str;
 	print '</table></div>';
 }
 
