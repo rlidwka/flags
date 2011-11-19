@@ -22,13 +22,12 @@ function draw_data(data, curr)
 		return a > sum ? a : sum;
 	}, 0);
 
-	if (max == 0) return;
-
 	var datah = {};
 	for (var i=0; i<data.length; i++) {
 		datah[data[i][0]] = [data[i][1], data[i][2]];
 	}
 
+	if (max > 0)
 	for (var i=0; i<width/unit_w+1; i++) {
 		var acc = datah[curr-i] ? datah[curr-i][0] : 0;
 		var rej = datah[curr-i] ? datah[curr-i][1] : 0;
