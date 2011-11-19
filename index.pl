@@ -40,11 +40,13 @@ sub print_subsystem_report
 	my $system = shift;
 	my $diff = abs($system->{last} - time());
 	my $down = $system->{error} || $diff > 60;
-	print '	<td width="50%" class="'.($down?'down':'up').'">';
+	print '	<td width="50%" class="'.($down?'wrong':'ok').'">';
 	print "<table width=\"100%\"><tr><td>";
 	printf '%s: <b>%d</b>, ', $desc, $system->{processed};
 	if ($system->{error}) {
 		printf "ошибка: %s.", $system->{error};
+	} elsif ($diff > 1440*60) {
+		printf "подсистема не запущена.";
 	} elsif ($diff > 60) {
 		my $min = int($diff/60);
 		my $suf = $min%10==1?'у':($min%10>1 && $min%10<5 ? 'ы' : '');
@@ -83,7 +85,7 @@ sub printcell
 
 sub showstat {
 #	my $ishour = shift;
-	print '<div align="center" class="result"><table width="60%"><tr><th width="20%">IP</th><th width="20%">Processing</th><th width="20%">Accepted</th><th width="20%">Rejected</th><th width="20%">Total</th></tr>';
+	print '<div align="center" class="result"><table class="table" width="60%"><tr><th width="20%">IP</th><th width="20%">Processing</th><th width="20%">Accepted</th><th width="20%">Rejected</th><th width="20%">Total</th></tr>';
 	my %flags_h = %{$dbh->selectall_hashref("SELECT `from`, COUNT(*) as `total`, SUM(`resubmit`) as `resubmit`, SUM(`isok`) as `accepted` FROM `flags` WHERE `anstime` > DATE_SUB(NOW(), INTERVAL 1 HOUR) GROUP BY `from`", 'from')};
 	my %flags = %{$dbh->selectall_hashref("SELECT `from`, COUNT(*) as `total`, SUM(`resubmit`) as `resubmit`, SUM(`isok`) as `accepted` FROM `flags` GROUP BY `from`", 'from')};
 	my $str = '';
@@ -122,7 +124,7 @@ sub showstat {
 }
 
 sub showans {
-	print '<div align="center" class="result"><table width="60%"><tr><th width="20%">Answer</th><th width="20%">First time</th><th width="20%">Count</th><th width="20%">Action</th></tr>';
+	print '<div align="center" class="result"><table class="table" width="60%"><tr><th width="20%">Answer</th><th width="20%">First time</th><th width="20%">Count</th><th width="20%">Action</th></tr>';
 	my @ans = @{$dbh->selectall_arrayref("SELECT answer,action,count,first from answers ORDER BY answer")};
 
 	foreach (@ans) {

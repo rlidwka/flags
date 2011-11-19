@@ -34,7 +34,7 @@ if (param('flags')) {
 print '<body>';
 if (param('flags')) {
 	if (@flags) {
-		print '<div class="result" align="center"><table width="60%">';
+		print '<div class="result" align="center"><table width="60%" class="table">';
 		print '<th>Flag</th><th>Result</th>';
 		print join '', map {
 			my $r = '<tr class="'.$_->[2].'">';

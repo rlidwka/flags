@@ -1,5 +1,10 @@
 body {
+	background-color: #efeff2;
 	text-align: center;
+}
+
+.table {
+	background-color: #ffffff;
 }
 
 table.status td {
@@ -11,14 +16,6 @@ table.status td {
 table.status td td {
 	border: 0px solid black;
 	padding: 0px;
-}
-
-.up {
-	background-color: #99FF99;
-}
-
-.down {
-	background-color: #FF9999;
 }
 
 .nomargin {
@@ -40,11 +37,11 @@ table.status td td {
 }
 
 .wrong {
-	background-color: #ffcccc;
+	background-color: #ffbbbb;
 }
 
 .ok {
-	background-color: #ccffcc;
+	background-color: #bbffbb;
 }
 
 canvas {
