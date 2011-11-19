@@ -31,7 +31,44 @@ $start =~ s{<!DOCTYPE.*?>}{<!DOCTYPE html>}s;
 print $start;
 
 print '<div><canvas id="graph" width=100 height=50>[ вам определённо пора обновить браузер :) ]</canvas></div>';
-print '<div><a href="submit.pl">Добавить флаги...</a></div><br>';
+system_status();
+print '<br>';
+
+sub print_subsystem_report
+{
+	my $desc = shift;
+	my $system = shift;
+	my $diff = abs($system->{last} - time());
+	my $down = $system->{error} || $diff > 60;
+	print '	<td width="50%" class="'.($down?'down':'up').'">';
+	print "<table width=\"100%\"><tr><td>";
+	printf '%s: <b>%d</b>, ', $desc, $system->{processed};
+	if ($system->{error}) {
+		printf "ошибка: %s.", $system->{error};
+	} elsif ($diff > 60) {
+		my $min = int($diff/60);
+		my $suf = $min%10==1?'у':($min%10>1 && $min%10<5 ? 'ы' : '');
+		$suf = '' if (int($min/10)%10==1);
+		printf "подсистема лежит <b>%d</b> минут%s.", $min, $suf;
+	} else {
+		printf "подсистема работает.";
+	}
+	print "</td>";
+	printf "<td>%s</td>", $system->{addr};
+	print "</tr></table>";
+	print '	</td>';
+}
+
+sub system_status
+{
+	my %system = %{$dbh->selectall_hashref("SELECT app,UNIX_TIMESTAMP(last) as last,processed,error,addr FROM stats", 'app')};
+	print '<div>';
+	print '<table width="100%" class="status" cellpadding=0 cellspacing=0><tr>'; 
+	print_subsystem_report('Принято (telnet)', $system{receive});
+	print_subsystem_report('Отправлено', $system{submit});
+	print '</tr></table>';
+	print '</div>';
+}
 
 sub printcell 
 {
@@ -80,6 +117,7 @@ sub showstat {
 	print '<tr><td colspan=5></td></tr>';
 
 	print $str;
+	print '<tr><td colspan="5"><a href="submit.pl">Добавить флаги...</a></td></tr>';
 	print '</table></div>';
 }
 

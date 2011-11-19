@@ -11,6 +11,7 @@ use Common;
 our $dbh = connectdb();
 
 my @flags = @{$dbh->selectcol_arrayref('SELECT flag FROM flags WHERE resubmit=1 ORDER BY anstime ASC, addtime ASC LIMIT 10')};
+$dbh->do('INSERT INTO stats (app, last) VALUES ("submit", NOW()) ON DUPLICATE KEY UPDATE last=NOW(), error=NULL, addr=?', undef, config('submit/host').':'.config('submit/port'));
 exit if (!@flags);
 
 our %answers = %{config('submit/answers')};
@@ -36,6 +37,8 @@ sub addflag
 	if (!$resubmit) {
 		$dbh->do('INSERT INTO graph (time_min, accepted, rejected) VALUES(?, ?, ?) ON DUPLICATE KEY UPDATE accepted=accepted+?, rejected=rejected+?', undef, int(time()/60), $isok?1:0, $isok?0:1, $isok?1:0, $isok?0:1);
 	}
+
+	$dbh->do('UPDATE stats SET processed=processed+1, last=NOW(), error=NULL WHERE app="submit"');
 }
 
 $| = 1;
@@ -46,7 +49,12 @@ $socket = new IO::Socket::INET (
 	PeerHost => config('submit/host'),
 	PeerPort => config('submit/port'),
 	Proto => 'tcp',
-) or die "sock error: $!\n";
+);
+if (!$socket) {
+	my $err = $!;
+	$dbh->do('INSERT INTO stats (app, last) VALUES ("submit", NOW()) ON DUPLICATE KEY UPDATE last=NOW(), error=?', undef, $err);
+	die "sock error: $err\n";
+}
 $socket->blocking(0);
 
 print "connected\n";

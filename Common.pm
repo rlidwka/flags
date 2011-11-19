@@ -5,7 +5,7 @@ use warnings;
 use strict;
 use DBI;
 use Data::Dumper;
-use HTML::Entities qw(encode_entities decode_entities);
+use HTML::Entities qw(decode_entities);
 use CGI qw/-utf8 :standard/;
 
 our @ISA = qw(Exporter);

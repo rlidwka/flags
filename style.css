@@ -2,6 +2,25 @@ body {
 	text-align: center;
 }
 
+table.status td {
+	border: 1px solid black;
+	border-collapse: collapse;
+	padding: 2px;
+}
+
+table.status td td {
+	border: 0px solid black;
+	padding: 0px;
+}
+
+.up {
+	background-color: #99FF99;
+}
+
+.down {
+	background-color: #FF9999;
+}
+
 .nomargin {
 	margin: 0px;
 }
